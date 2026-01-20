@@ -1,0 +1,13 @@
+# Ignore database config
+db.php
+
+# Ignore XAMPP & system files
+*.log
+*.tmp
+
+# Ignore Git internal
+.git/
+
+# Ignore OS files
+Thumbs.db
+.DS_Store

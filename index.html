@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Banking Management System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: url("bank-bgg.jpg") no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            color: #fff;
+        }
+
+
+        h1,
+        h2,
+        h3 {
+            text-align: center;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            /* backdrop-filter: blur(10px); */
+            /* background: rgba(0, 0, 0, 0.6); */
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+
+        .nav-left {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .navbar a {
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 5px 30px;
+            border-radius: 6px;
+        }
+
+        .navbar a:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .page {
+            display: none;
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        .active {
+            display: block;
+        }
+
+
+
+        .card {
+            width: 380px;
+            margin: 80px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35);
+            text-align: center;
+        }
+
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 14px;
+            margin: 12px 0;
+            border-radius: 10px;
+            border: none;
+            outline: none;
+            font-size: 15px;
+        }
+
+        input::placeholder {
+            color: #666;
+        }
+
+
+        button {
+            padding: 14px;
+            width: 100%;
+            background: linear-gradient(135deg, #00dff4, #14ffb5);
+            color: #000;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            color: aqua;
+        }
+
+
+        .msg {
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .footer {
+            background: rgba(0, 0, 0, 0.75);
+            text-align: center;
+            padding: 15px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 14px;
+            animation: slideUp 3s ease;
+        }
+
+        /* Footer Animation */
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+
+        /* .page {
+            padding-bottom: 80px;
+            margin-right: auto;
+            justify-content: center;
+        } */
+
+        /* .mode-btn {
+            background: transparent;
+            border: 1px solid #fff;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            
+        }
+
+
+        .light-mode {
+            background: #f2f2f2 !important;
+            color: #000;
+        }
+
+        .light-mode .card,
+        .light-mode .navbar,
+        .light-mode .footer {
+            background: rgba(248, 248, 248, 0.1);
+            color: #000000;
+        } */
+
+        @media (max-width: 600px) {
+            .footer {
+                font-size: 12px;
+                padding: 10px;
+            }
+
+            .navbar {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            /* opacity control */
+            z-index: -1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+    <!-- <div class="navbar">
+        <div class="nav-left">
+            <a onclick="showPage('login')">Login</a>
+            <a onclick="showPage('customer')">Add Customer</a>
+            <a onclick="showPage('account')">Add Account</a>
+            <a onclick="showPage('transactions')">Transactions</a>
+            <a onclick="showPage('loans')">Loans</a>
+        </div>
+
+        <button class="mode-btn" onclick="toggleMode()">🌙</button>
+    </div> -->
+
+    <div class="navbar">
+        <div class="nav-left">
+            <a id="navLogin" onclick="showPage('login')">Login</a>
+
+            <a data-admin-only onclick="showPage('customer')">Add Customer</a>
+            <a data-admin-only onclick="showPage('account')">Add Account</a>
+
+            <a onclick="showPage('transactions')">Transactions</a>
+            <a onclick="showPage('loans')">Loans</a>
+        </div>
+
+        <div class="nav-right">
+            <span id="welcomeText" style="font-weight:bold;"></span>
+            <a id="navLogout" onclick="doLogout()" style="display:none;">Logout</a>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+    <!-- ================= LOGIN ================= -->
+    <div id="login" class="page active">
+
+
+        <div class="card">
+            <h2>Login</h2>
+            <input id="username" placeholder="Username">
+            <input id="password" type="password" placeholder="Password">
+            <select id="role">
+                <option>Admin</option>
+                <option>Employee</option>
+            </select>
+            <button type="button" onclick="doLogin()">Login</button>
+
+            <div id="login_msg" class="msg"></div>
+        </div>
+    </div>
+
+    <!-- ================= CREATE CUSTOMER ================= -->
+    <div id="customer" class="page">
+        <div class="card">
+            <h2>Create Customer</h2>
+            <input id="c_name" placeholder="Name">
+            <input id="c_email" placeholder="Email">
+            <input id="c_phone" placeholder="Phone">
+            <textarea id="c_address" placeholder="Address"></textarea>
+            <button onclick="createCustomer()">Create Customer</button>
+            <div id="c_msg" class="msg"></div>
+        </div>
+    </div>
+
+    <!-- ================= CREATE ACCOUNT ================= -->
+    <div id="account" class="page">
+        <div class="card">
+            <h2>Create Account</h2>
+            <input id="a_customer" placeholder="Customer ID">
+            <select id="a_type">
+                <option>Savings</option>
+                <option>Current</option>
+            </select>
+            <input id="a_init" type="number" placeholder="Initial Deposit">
+            <button onclick="createAccount()">Create Account</button>
+            <div id="a_msg" class="msg"></div>
+        </div>
+    </div>
+
+    <!-- ================= TRANSACTIONS ================= -->
+    <div id="transactions" class="page">
+        <div class="card">
+            <h2>Transactions</h2>
+
+            <h3>Deposit</h3>
+            <input id="dep_acc" placeholder="Account ID">
+            <input id="dep_amt" placeholder="Amount">
+            <button onclick="deposit()">Deposit</button>
+            <div id="dep_msg" class="msg"></div>
+
+            <h3>Withdraw</h3>
+            <input id="wd_acc" placeholder="Account ID">
+            <input id="wd_amt" placeholder="Amount">
+            <button onclick="withdraw()">Withdraw</button>
+            <div id="wd_msg" class="msg"></div>
+
+            <h3>Transfer</h3>
+            <input id="tr_from" placeholder="From Account ID">
+            <input id="tr_to" placeholder="To Account ID">
+            <input id="tr_amt" placeholder="Amount">
+            <button onclick="transfer()">Transfer</button>
+            <div id="tr_msg" class="msg"></div>
+
+            <!-- 🔽 এখানেই paste করবে 🔽 -->
+
+            <hr style="margin:20px 0; opacity:0.3;">
+
+            <h3>Transaction History</h3>
+
+            <input id="tx_filter_acc" placeholder="Filter by Account ID (optional)">
+            <button type="button" onclick="loadTransactions()">Refresh History</button>
+
+            <div style="overflow:auto; max-height:260px; margin-top:10px;">
+                <table style="width:100%; border-collapse:collapse; color:#fff; font-size:14px;">
+                    <thead>
+                        <tr style="text-align:left; opacity:0.9;">
+                            <th style="padding:8px;">#</th>
+                            <th style="padding:8px;">Type</th>
+                            <th style="padding:8px;">From</th>
+                            <th style="padding:8px;">To</th>
+                            <th style="padding:8px;">Account</th>
+                            <th style="padding:8px;">Amount</th>
+                            <th style="padding:8px;">Time</th>
+
+                        </tr>
+                    </thead>
+                    <tbody id="tx_body"></tbody>
+                </table>
+            </div>
+
+            <!-- 🔼 এখানেই শেষ 🔼 -->
+
+        </div>
+    </div>
+
+
+    <!-- ================= LOANS ================= -->
+    <div id="loans" class="page">
+        <div class="card">
+            <h2>Apply Loan</h2>
+            <input id="loan_cust" placeholder="Customer ID">
+            <input id="loan_amt" placeholder="Loan Amount">
+            <input id="loan_emi" placeholder="EMI">
+            <button type="button" onclick="applyLoan()">Apply Loan</button>
+            <div id="loan_msg" class="msg"></div>
+
+            <!-- ✅ Admin-only block -->
+            <div id="approveBlock">
+                <h2>Approve Loan</h2>
+                <input id="loan_id" placeholder="Loan ID">
+                <button type="button" onclick="approveLoan()">Approve Loan</button>
+                <div id="approve_msg" class="msg"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+    <script>
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const target = document.getElementById(id);
+            if (target) target.classList.add('active');
+        }
+
+
+        // function doLogin() {
+        //     fetch("api/login.php", {
+        //         method: "POST",
+        //         headers: { "Content-Type": "application/json" },
+        //         body: JSON.stringify({
+        //             username: username.value,
+        //             password: password.value,
+        //             role: role.value
+        //         })
+        //     })
+        //         .then(async (r) => {
+        //             const text = await r.text();
+        //             // status দেখাবে: 200/401/500 etc
+        //             login_msg.innerHTML = `Status: ${r.status} | ${text}`;
+        //             if (text === "success") {
+        //                 applyRoleUI(role.value);
+        //                 showPage(role.value === "Admin" ? "customer" : "transactions");
+        //             }
+        //         })
+        //         .catch((err) => {
+        //             login_msg.innerHTML = "Fetch Failed: " + err;
+        //         });
+        // }
+
+        function setLoginMessage(text, ok) {
+            const box = document.getElementById("login_msg") || document.getElementById("msg");
+            if (!box) return; // message div না থাকলে silent
+            box.innerHTML = text;
+            box.style.color = ok ? "#9dffb3" : "#ffb3b3";
+        }
+
+        function doLogin() {
+            setLoginMessage("Checking...", true);
+
+            fetch("api/login.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username: (username.value || "").trim(),
+                    password: password.value || "",
+                    role: role.value || ""
+                })
+            })
+                .then(async (r) => {
+                    const text = await r.text();
+
+                    if (text === "success") {
+                        const u = (username.value || "").trim();
+                        const rRole = role.value || "";
+
+                        setLoginMessage("Login Successful ✅", true);
+
+                        // ✅ navbar + role + page switch (admin/customer, employee/transactions)
+                        setLoggedInUI(u, rRole);
+
+                        // ✅ auto load history when logged in
+                        if (typeof loadTransactions === "function") loadTransactions();
+
+                        // ✅ optional: clear inputs
+                        username.value = "";
+                        password.value = "";
+                    } else {
+                        setLoginMessage(text, false);
+                    }
+                })
+                .catch((err) => {
+                    setLoginMessage("Server error: " + err, false);
+                });
+        }
+
+
+
+        function applyRoleUI(userRole) {
+            // navbar/menu যেগুলো শুধু Admin দেখবে
+            document.querySelectorAll("[data-admin-only]").forEach(el => {
+                el.style.display = (userRole === "Admin") ? "inline-block" : "none";
+            });
+
+            // Loans page এ approve অংশ শুধু Admin দেখবে
+            const approveBlock = document.getElementById("approveBlock");
+            if (approveBlock) {
+                approveBlock.style.display = (userRole === "Admin") ? "block" : "none";
+            }
+        }
+
+
+
+
+        /* ===== API CALLS ===== */
+
+        function createCustomer() {
+            fetch("api/create_customer.php", {
+                method: "POST",
+                body: JSON.stringify({
+                    name: c_name.value,
+                    email: c_email.value,
+                    phone: c_phone.value,
+                    address: c_address.value
+                })
+            }).then(r => r.text()).then(t => c_msg.innerHTML = t);
+        }
+
+        function createAccount() {
+            fetch("api/create_account.php", {
+                method: "POST",
+                body: JSON.stringify({
+                    customer_id: a_customer.value,
+                    type: a_type.value,
+                    deposit: a_init.value
+                })
+            }).then(r => r.text()).then(t => a_msg.innerHTML = t);
+        }
+
+        function deposit() {
+            fetch("api/deposit.php", {
+                method: "POST",
+                body: JSON.stringify({
+                    account: dep_acc.value,
+                    amount: dep_amt.value
+                })
+            })
+                .then(r => r.text())
+                .then(t => { dep_msg.innerHTML = t; loadTransactions(); });
+
+        }
+
+
+        function withdraw() {
+            fetch("api/withdraw.php", {
+                method: "POST",
+                body: JSON.stringify({
+                    account: wd_acc.value,
+                    amount: wd_amt.value
+                })
+            })
+                .then(r => r.text())
+                .then(t => { wd_msg.innerHTML = t; loadTransactions(); });
+
+        }
+
+
+        function transfer() {
+            fetch("api/transfer.php", {
+                method: "POST",
+                body: JSON.stringify({
+                    from: tr_from.value,
+                    to: tr_to.value,
+                    amount: tr_amt.value
+                })
+            })
+                .then(r => r.text())
+                .then(t => { tr_msg.innerHTML = t; loadTransactions(); });
+
+        }
+
+
+        function applyLoan() {
+            fetch("api/apply_loan.php", {
+                method: "POST",
+                body: JSON.stringify({
+                    customer: loan_cust.value,
+                    amount: loan_amt.value,
+                    emi: loan_emi.value
+                })
+            })
+                .then(r => r.text())
+                .then(t => loan_msg.innerHTML = t);
+        }
+
+        function approveLoan() {
+            fetch("api/approve_loan.php", {
+                method: "POST",
+                body: JSON.stringify({
+                    loan_id: loan_id.value
+                })
+            })
+                .then(r => r.text())
+                .then(t => approve_msg.innerHTML = t);
+        }
+
+
+
+        function toggleMode() {
+            document.body.classList.toggle("light-mode");
+        }
+        function loadTransactions() {
+            const acc = (document.getElementById("tx_filter_acc").value || "").trim();
+            const url = acc
+                ? `api/transactions_list.php?account=${encodeURIComponent(acc)}`
+                : "api/transactions_list.php";
+
+            fetch(url)
+                .then(r => r.json())
+                .then(rows => {
+                    const body = document.getElementById("tx_body");
+                    body.innerHTML = "";
+
+                    if (!rows.length) {
+                        body.innerHTML = `<tr><td colspan="7" style="padding:10px; opacity:0.8;">No transactions found</td></tr>`;
+
+                        return;
+                    }
+
+                    rows.forEach(row => {
+                        const from = (row.from_account === null || row.from_account === undefined) ? "-" : row.from_account;
+                        const to = (row.to_account === null || row.to_account === undefined) ? "-" : row.to_account;
+
+                        // deposit/withdraw এ account_id থাকে
+                        const accId = (row.account_id === null || row.account_id === undefined) ? "-" : row.account_id;
+
+                        body.innerHTML += `
+    <tr style="border-top:1px solid rgba(255,255,255,0.15);">
+      <td style="padding:8px;">${row.txn_id}</td>
+      <td style="padding:8px;">${row.txn_type}</td>
+      <td style="padding:8px;">${from}</td>
+      <td style="padding:8px;">${to}</td>
+      <td style="padding:8px;">${accId}</td>
+      <td style="padding:8px;">${row.amount}</td>
+      <td style="padding:8px;">${row.txn_date}</td>
+    </tr>
+  `;
+                    });
+
+                })
+                .catch(() => {
+                    const body = document.getElementById("tx_body");
+                    body.innerHTML = `<tr><td colspan="7" style="padding:10px; color:#ffb3b3;">Failed to load history</td></tr>`;
+
+                });
+        }
+
+
+        function setLoggedOutUI() {
+            // navbar
+            document.getElementById("welcomeText").innerHTML = "";
+            document.getElementById("navLogout").style.display = "none";
+            document.getElementById("navLogin").style.display = "inline-block";
+
+            // admin-only hide by default
+            applyRoleUI("Employee"); // hides admin links + approve block
+            showPage("login");
+        }
+
+        function setLoggedInUI(username, role) {
+            document.getElementById("welcomeText").innerHTML = `Welcome, ${username} (${role})`;
+            document.getElementById("navLogout").style.display = "inline-block";
+            document.getElementById("navLogin").style.display = "none";
+
+            applyRoleUI(role);
+
+            // role অনুযায়ী default landing page
+            showPage(role === "Admin" ? "customer" : "transactions");
+        }
+
+        function checkSession() {
+            fetch("api/me.php")
+                .then(r => r.json())
+                .then(data => {
+                    if (data.loggedIn) {
+                        setLoggedInUI(data.username, data.role);
+                        // logged in হলে transaction history auto load
+                        loadTransactions();
+                    } else {
+                        setLoggedOutUI();
+                    }
+                })
+                .catch(() => setLoggedOutUI());
+        }
+
+        // page load হলে session check
+        window.addEventListener("load", checkSession);
+
+        function doLogout() {
+            fetch("api/logout.php")
+                .then(r => r.text())
+                .then(() => {
+                    setLoginMessage("Logged out ✅", true);
+                    setLoggedOutUI();
+                });
+        }
+
+
+    </script>
+
+    <footer class="footer">
+        <p>© 2026 Banking Management System</p>
+        <p>Developed by [K.H.Limon]</p>
+    </footer>
+
+
+</body>
+
+</html>
